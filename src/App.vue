@@ -1,7 +1,15 @@
 <template>
-  <div @click="(createPath($event))" class="root-container">
+  <div @click="(createPath($event))"  class="root-container">
     <tree :tree-data="tree"></tree>
-    <div class="info">{{`Путь: ${path}`}}</div>
+    <div class="card">
+    <div class="info"> <h1 class="path">{{`Путь: ${path}`}}</h1></div>
+    <div class="info"> 
+      <h1 class="navigations">Клавиатурная навигация</h1>
+      <p class="text"><span class="text-button">Enter</span> открыть/закрыть папку</p>
+      <p class="text"><span class="text-button">TAB</span> перемещаться по списку вниз</p>
+      <p class="text"><span class="text-button">SHIFT</span> + <span class="text-button">TAB</span> перемещаться по списку вверх</p>
+    </div>
+    </div>
   </div>
 </template>
 
@@ -11,7 +19,9 @@ import collections from "../public/static/node_modules.json";
 export default {
   data: () => ({
     tree: collections,
-    path: ''
+    path: '',
+    last: null
+    
   }),
   components: {
     Tree,
@@ -38,6 +48,18 @@ path.push(item.children[0].textContent)
 this.path = path.join('//')
       }
   },
+
+
+
+  focus: function (event) {
+if(event.code == 'Enter' && event.target.parentElement.classList.contains('folder')) {
+    event.target.parentElement.lastElementChild.classList.toggle('toggle')
+  }
+  this.createPath(event)
+  }
+  },
+  mounted() {
+    document.addEventListener('keydown',this.focus) 
   }
 };
 </script>
@@ -53,8 +75,11 @@ this.path = path.join('//')
   -moz-osx-font-smoothing: grayscale;
   text-decoration: none;
   color: black;
+  
 }
-
+*:focus {
+outline: 3px double #596e3d;
+}
 html,body {
   height: 100%;
 }
@@ -66,15 +91,53 @@ html,body {
   width: 100%;
 }
 
+.navigations {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.text:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.path {
+  font-size: 15px;
+}
+
 .info {
   padding: 1rem;
   display: flex;
   border-radius: 10px;
   box-shadow: 2px 3px 10px rgba(0, 0, 0, 0.2);
   background: #fff;
+  align-items: center;
+}
+
+.info:not(:last-child) {
+margin-bottom: 20px;
+}
+
+.info:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.text-button {
+  border: 3px solid #6b6767;
+    padding: 1px;
+    background: black;
+    color: white;
+}
+.card {
+  display: flex;
+  flex-direction: column;
   max-width: 500px;
   width: 100%;
   max-height: 101px;
-  align-items: center;
+}
+
+.toggle {
+display: none;
 }
 </style>

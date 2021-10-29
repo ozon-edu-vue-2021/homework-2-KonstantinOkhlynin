@@ -1,21 +1,27 @@
 <template>
-  <li class="node-tree" :class="activeClass(node.type, node.name)">
-    <span @click="(isActive = !isActive)" class="name">{{
+  <li class="node-tree"  :class="activeClass(node.type, node.name)"  >
+    <span @click="isActive = !isActive" v-if="node.type === 'directory' || node.type === 'file'" tabindex="0"  class="name">{{
       node.name
     }}</span>
 
-    <ul class="ul" v-if="node.contents && node.contents.length" v-show="isActive">
+    <a @click="isActive = !isActive" v-else tabindex="0"  :href="node.target" class="name">{{
+      node.name
+    }}</a>
+
+    <ul class="ul" v-if="node.contents && node.contents.length" :class="{toggle: isActive}" >
       <node
         v-for="(child, idx) in node.contents"
         :node="child"
         :key="idx"
       ></node>
     </ul>
-    
   </li>
 </template>
 
 <script>
+
+
+
 export default {
   name: "node",
   props: {
@@ -23,7 +29,7 @@ export default {
   },
   data() {
     return {
-      isActive: false,
+      isActive: true,
       mdRegex: /\.m?md$/,
       jsRegex: /\.m?js$/,
       jsonRegex: /\.m?json$/,
@@ -45,9 +51,13 @@ export default {
         }
       } else if (type === "directory") {
         return { folder: true };
+      } else if (type === "link") {
+        return { link: true };
       }
-    }, 
-  }
+    },
+
+  },
+
   
 };
 </script>
@@ -128,5 +138,23 @@ li .folder {
   height: 20px;
   position: absolute;
   background-image: url("../assets/folder.svg");
+}
+
+.link {
+  position: relative;
+}
+
+.link::before {
+  content: "";
+  top: 0;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  background-image: url("../assets/link.svg");
+}
+
+.toggle {
+display: none;
 }
 </style>
